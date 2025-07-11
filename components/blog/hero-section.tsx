@@ -1,19 +1,21 @@
 import Image from 'next/image'
-import React from 'react'
 
-const HeroSection = () => {
+export default function HeroSection() {
   return (
-    <header>
+    <header className="relative w-full lg:h-[600px] md:h-[500px] h-[400px] rounded-xl ">
       <Image
-        src="/path/to/your/image.jpg"
+        src="/images/hero-Image.jpg"
         alt="Hero Image"
-        layout="responsive"
-        width={700}
-        height={475}
         fill
+        className="object-cover rounded-xl"
       />
+      <div className="absolute rounded-xl inset-0 bg-black/30 flex items-center justify-center ">
+      </div>
+      <div className='absolute -bottom-[50px] lg:left-10 lg:right-auto left-5 right-5  max-w-lg bg-white dark:bg-gray-800/80 p-6 rounded-lg shadow-lg '>
+        {/* badge */}
+        <p className='text-xs bg-blue-400 text-white px-2 inline rounded-lg'>Technology</p>
+        <p className='mt-2 text-3xl'>The Impact of Technology on the Workplace: How Technology is Changing</p>
+      </div>
     </header>
   )
 }
-
-export default HeroSection

@@ -13,7 +13,7 @@ const BlogNavbar = () => {
   return (
     <div>
       {/* Large screen */}
-      <div className="hidden lg:flex justify-between items-center py-5 lg:px-32 md:px-16 px-5 border fixed top-0 left-0 right-0  z-50">
+      <div className="hidden lg:flex justify-between items-center py-5 lg:px-32 md:px-16 px-5 border fixed top-0 left-0 right-0  z-50 bg-background">
         <Logo />
         <ul className="flex space-x-4">
           <li>
@@ -30,7 +30,7 @@ const BlogNavbar = () => {
       </div>
 
       {/* Small screen */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 border ">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 border bg-background ">
         <div className="flex justify-between items-center py-5 px-5">
           <Logo />
 
@@ -43,7 +43,7 @@ const BlogNavbar = () => {
 
         {/* Mobile menu links */}
         {isOpen && (
-          <div className="px-5 pb-4">
+          <div className="px-5 pb-4 ">
             <ul className="flex flex-col space-y-2">
               <li>
                 <Link href="/" onClick={() => setIsOpen(false)}>
