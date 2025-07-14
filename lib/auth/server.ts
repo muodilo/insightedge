@@ -1,5 +1,4 @@
-
-
+// server.ts
 import { getServerSession } from "next-auth";
 import type { NextAuthOptions, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -36,22 +35,30 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const email = credentials?.email;
-        const password = credentials?.password;
-        if (!email || !password) return null;
+        try {
+          const email = credentials?.email;
+          const password = credentials?.password;
+          if (!email || !password) return null;
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
 
-        if (error || !data.user) return null;
+          if (error || !data.user) {
+            console.error("Supabase auth error:", error);
+            return null;
+          }
 
-        return {
-          id: data.user.id,
-          email: data.user.email,
-          role: data.user.user_metadata?.role || "user",
-        };
+          return {
+            id: data.user.id,
+            email: data.user.email,
+            role: data.user.user_metadata?.role || "user",
+          };
+        } catch (error) {
+          console.error("Authorization error:", error);
+          return null;
+        }
       },
     }),
     GoogleProvider({
@@ -72,18 +79,36 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
 
+  // Add these important production settings
+  secret: process.env.NEXTAUTH_SECRET,
+  
   callbacks: {
     async jwt({ token, user, account, profile }) {
+      // Handle credentials provider
       if (user?.role) {
         token.role = user.role;
       }
 
+      // Handle OAuth providers
       if (account && account.provider !== "credentials") {
-        if (!token.email && profile?.email) {
-          token.email = profile.email;
+        try {
+          if (!token.email && profile?.email) {
+            token.email = profile.email;
+          }
+          const email = token.email ?? "";
+          
+
+          const { data: existingUser } = await supabase
+            .from('users') // Adjust table name as needed
+            .select('role')
+            .eq('email', email)
+            .single();
+          
+          token.role = existingUser?.role || (email.endsWith("@gmail.com") ? "user" : "admin");
+        } catch (error) {
+          console.error("JWT callback error:", error);
+          token.role = "user"; // Default fallback
         }
-        const email = token.email ?? "";
-        token.role = email.endsWith("@gmail.com") ? "user" : "admin";
       }
 
       return token;
@@ -96,6 +121,9 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+
+  
+  debug: process.env.NODE_ENV === "development",
 };
 
 export const auth = () => getServerSession(authOptions);
