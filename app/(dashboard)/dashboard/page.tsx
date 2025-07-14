@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { authOptions } from '@/lib/auth/server' 
 import { redirect } from 'next/navigation'
 import { Activity, Clock, Gauge } from "lucide-react"
 
